@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import subprocess
 import re
 import sys
@@ -146,13 +147,11 @@ def extract_subtitle_tracks_from_tree(root):
     return subtitle_tracks
 
 def get_subtitle_tracks(mkv_file):
-    # 运行 mkvinfo 命令并获取输出
     result = subprocess.run(['mkvinfo', '--ui-language', 'en', mkv_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     output = result.stdout
 
     tree = parse_mkvinfo_output(output)
     subtitle_tracks = extract_subtitle_tracks_from_tree(tree)
-    print(subtitle_tracks)
     return subtitle_tracks
 
 def extract_single_subtitle(mkv_file, track):
@@ -169,23 +168,26 @@ def extract_single_subtitle(mkv_file, track):
 
 def extract_all_subtitles(mkv_file, subtitle_tracks):
     for track in subtitle_tracks:
-        print(f"Track ID: {track['track_id']}, Format: {track['format']}, Language: {track['language']}")
         extract_single_subtitle(mkv_file, track)
 
 def convert_smb_path(path):
     if os.name == 'nt':
-        # Windows SMB 路径转换
         return path.replace('/', '\\')
     else:
-        # Mac SMB 路径转换
         return path.replace('\\', '/')
 
-# 示例用法
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python main.py <path_to_mkv_file>")
+def main_cli():
+    if len(sys.argv) < 2:
+        print("Usage: main.py <mkv_file>")
         sys.exit(1)
 
-    mkv_file = convert_smb_path(sys.argv[1])
-    subtitles = get_subtitle_tracks(mkv_file)
-    extract_all_subtitles(mkv_file, subtitles)
+    mkv_file = sys.argv[1]
+    subtitle_tracks = get_subtitle_tracks(mkv_file)
+    extract_all_subtitles(mkv_file, subtitle_tracks)
+
+if __name__ == "__main__":
+    if "--gui" in sys.argv:
+        from gui import main_gui
+        main_gui()
+    else:
+        main_cli()
