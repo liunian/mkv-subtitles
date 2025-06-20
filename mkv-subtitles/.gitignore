@@ -1,0 +1,9 @@
+CMakePresets.json
+CMakeUserPresets.json
+out/
+build/
+cmake-build-debug/
+.vs/
+.idea/
+_CPack_Packages/
+*.exe
